@@ -188,9 +188,20 @@ private List<Map> handleAcceleration(descMap) {
 
 private List<Map> parseAxis(List<Map> attrData) {
 	def results = []
-	def x = hexToSignedInt(attrData.find { it.attrInt == 0x0012 }?.value)
-	def y = hexToSignedInt(attrData.find { it.attrInt == 0x0013 }?.value)
-	def z = hexToSignedInt(attrData.find { it.attrInt == 0x0014 }?.value)
+
+	def attrsFound = []
+	for (attrId in [0x0012, 0x0013, 0x0014]) {
+		def val = attrData.find { it.attrInt == attrId }?.value
+		if (!val) {
+			return results
+		} else {
+			attrsFound << val
+		}
+	}
+
+	def x = hexToSignedInt(attrsFound[0])
+	def y = hexToSignedInt(attrsFound[1])
+	def z = hexToSignedInt(attrsFound[2])
 
 	def xyzResults = [:]
 	if (device.getDataValue("manufacturer") == "SmartThings") {
